@@ -1,0 +1,44 @@
+body{
+  text-align: center;
+}
+input{
+   font-size: 14px;
+   border-radius: 5px;
+   text-align: center;
+   margin-bottom: 20px;
+}
+#title{
+  margin-top:0;
+}
+table{
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 20px auto;
+  border: 1px;
+  background-color: #f8dcab;
+}
+td {
+  border: solid #f8dcab 0px;
+  height: 70px;
+  width: 70px;
+  cursor: pointer;
+  padding: 0px;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.highlight {
+  background-color: #fef6a5;
+}
+button{
+	font-size: 14px;
+	background-color: #c0c0c0;
+	padding: 3px 10px;
+	margin: 5px 5px;
+
+}
+#button{
+  margin-bottom: 5px;
+}
+h6{
+  margin-top: 0px;
+}
