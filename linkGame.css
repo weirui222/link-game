@@ -1,5 +1,7 @@
 body{
   text-align: center;
+  background-color: rgba(248, 220, 171, .7);
+  background-opacity: 0.6;
 }
 input{
    font-size: 14px;
@@ -19,8 +21,8 @@ table{
 }
 td {
   border: solid #f8dcab 0px;
-  height: 70px;
-  width: 70px;
+  height: 60px;
+  width: 60px;
   cursor: pointer;
   padding: 0px;
   background-repeat: no-repeat;
@@ -35,10 +37,4 @@ button{
 	padding: 3px 10px;
 	margin: 5px 5px;
 
-}
-#button{
-  margin-bottom: 5px;
-}
-h6{
-  margin-top: 0px;
 }

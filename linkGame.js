@@ -1,20 +1,19 @@
-var row = 8;
-var column = 16;
+var row = 6;
+var column = 8;
 //row = document.getElementById("rows").value;
 //column = document.getElementById("columns").value;
 var types = 18;
-var X = row + 2;
-var Y = column +2;
-var total = X * Y;
-var remaining = row * column;
+var X;
+var Y;
+var total;
+var remaining;
 
-//imags
-var imgs = new Array(types);
+
 
 //table
 var table = document.getElementById("table");
 
-var theBoard = new Array(total);;
+var theBoard;
 
 var lastPosition = -1;
 var lastPair = [];
@@ -22,13 +21,12 @@ var lastPath = [];
 var showingLines = false;
 
 var init = function() {
-  //row = document.getElementById("rows").value;
-  //column = document.getElementById("columns").value;
-  //theBoard = new Array(total);
-  for (var i = 0; i < imgs.length; i++) {
-    imgs[i]="r_"+(i+1)+".png";
-  }
-
+  $("#alert").hide();
+  X = row + 2;
+  Y = column +2;
+  total = X * Y;
+  remaining = row * column;
+  theBoard = new Array(total);
   for (var i = 0; i < X; i++) {
     //The value of -1 results in a new row being inserted at the last position.
     var tr = table.insertRow(-1);
@@ -47,7 +45,9 @@ var init = function() {
   }
 
   document.getElementById("reset").addEventListener("click", function(){
+    $("#alert").hide();
     initBoard(theBoard);
+
   });
 }
 
@@ -346,7 +346,7 @@ var onCellClick = function() {
     }
 
     showingLines = true;
-    setTimeout(hideLines, 1000);
+    setTimeout(hideLines, 500);
 
     theBoard[lastPosition] = 0;
     theBoard[curPosition] = 0;
@@ -363,20 +363,30 @@ var onCellClick = function() {
     //console.log(" X find path/ dif content");
   }
 }
-/*
+
 document.getElementById("form").addEventListener("submit", function(evt) {
   evt.preventDefault();
-  console.log("set submit button clicked");
-  init();
-  });
+  row = parseInt(document.getElementById("rows").value);
+  column = parseInt(document.getElementById("columns").value);
+  if((row * column) % 2 !== 0){
+    console.log("odd");
+    document.getElementById("rows").value = "";
+    document.getElementById("columns").value = "";
+    $("#alert").show();
+  }else {
+    $("table").find("tr").remove();
+    init();
+  }
+
+});
 
 document.getElementById("clear").addEventListener("click", function() {
     console.log("set clear button clicked");
-    document.getElementById("rows").innerHTML='';
-    document.getElementById("columns").innerHTML='';
+    document.getElementById("rows").value = "";
+    document.getElementById("columns").value = "";
   });
 
-  */
+
 
 init();
 
