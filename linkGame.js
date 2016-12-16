@@ -215,7 +215,6 @@ var reshuffleIfNeeded = function(board) {
   if (remaining !== 0) {
     while (!linkExist(board)) {
       reshuffleBoard(board);
-      break;
     }
   } else {
     $('#status').text('You won');
