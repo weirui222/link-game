@@ -1,17 +1,12 @@
 var row = 6;
 var column = 8;
-//row = document.getElementById("rows").value;
-//column = document.getElementById("columns").value;
 var types = 18;
 var X;
 var Y;
 var total;
 var remaining;
 
-
-
-//table
-var table = document.getElementById("table");
+var table = document.getElementById('table');
 
 var theBoard;
 
@@ -20,169 +15,33 @@ var lastPair = [];
 var lastPath = [];
 var showingLines = false;
 
-var init = function() {
-  $("#alert").hide();
-  X = row + 2;
-  Y = column +2;
-  total = X * Y;
-  remaining = row * column;
-  theBoard = new Array(total);
-  for (var i = 0; i < X; i++) {
-    //The value of -1 results in a new row being inserted at the last position.
-    var tr = table.insertRow(-1);
-    for (var j = 0; j < Y; j++) {
-      var td = tr.insertCell(-1);
-    }
-  }
+var indexToPosition = function(index) {
+  return { x: Math.floor(index / Y), y: index % Y };
+};
 
-  initBoard(theBoard);
+var positionToIndex = function(pos) {
+  return pos.x * Y + pos.y;
+};
 
-  var cells = document.getElementsByTagName('td');
-  // console.log(cells);
-  for (var i = 0; i < cells.length; i++) {
-    // console.log("add click cell " + cells[i].id);
-    cells[i].addEventListener('click', onCellClick);
-  }
-
-  document.getElementById("reset").addEventListener("click", function(){
-    $("#alert").hide();
-    initBoard(theBoard);
-
-  });
-}
-
-var isFrame = function(index){
+var isFrame = function(index) {
   var pos = indexToPosition(index);
-  return  pos.x === 0 || pos.x === X-1 || pos.y === 0 || pos.y === Y-1;
-}
+  return pos.x === 0 || pos.x === X - 1 || pos.y === 0 || pos.y === Y - 1;
+};
 
-var tableCell = function(index){
+var tableCell = function(index) {
   var pos = indexToPosition(index);
   return table.rows[pos.x].cells[pos.y];
-}
+};
 
-//create initial board
-var initBoard = function(board){
-  if (showingLines) {
-    return;
-  }
-
-  if (lastPosition !== -1) {
-    tableCell(lastPosition).className = "";
-  }
-
-  lastPosition = -1;
-
-  remaining = row * column;
-  $("#win").text("");
-
-  for(var i = 0; i < total; i++){
-    theBoard[i] = 0;
-    var cell = tableCell(i);
-    cell.id = "i_" + i;
-    //console.log(cell.id);
-    cell.innerHTML = "";
-  }
-
-  for(var i = 0; i < board.length; i++) {
-    if(board[i] === 0 && !isFrame(i)) {
-      var t = Math.floor(Math.random()* types) + 1;
-      board[i] = t;
-      var cell = tableCell(i);
-      cell.style.backgroundImage = "url('img/r_" + t + ".png')";
-      while(true) {
-        var c = Math.floor(Math.random() * (total-i)) + i;
-        if(board[c]=== 0 && !isFrame(c)){
-          board[c] = t;
-          var cell = tableCell(c);
-          cell.style.backgroundImage = "url('img/r_" + t + ".png')";
-          break;
-         }
-      }
-    }
-  }
-  reshuffleIfNeeded(board);
-}
-
-//check whether a pair of link exist
-var linkExist = function(board) {
-  for (var i = 0; i < board.length - 1 ; i++) {
-    if(board[i] !== 0){
-      for (var j = i+1; j < board.length; j++) {
-        if(board[j] === board[i] && findPath(board, i, j) !== null) {
-          console.log("p1",i,board[i],"p2",j,board[j]);
-          return true;
-        }
-      }
-    }
-  }
-  return false;
-}
-
-var shuffle = function(arr) {
-  var t;
-  var value;
-  for (var i = arr.length - 1; i >= 0; i--) {
-    t = Math.floor(Math.random()* (i + 1));
-    value = arr[t];
-    arr[t] = arr[i];
-    arr[i] = value;
-  }
-}
-
-//
-var reshuffleBoard = function(board) {
-  var arr = [];
-  for (var i = 0; i < board.length; i++) {
-    if (board[i] !== 0) {
-      arr.push(board[i]);
-    }
-  }
-  console.log(arr);
-  shuffle(arr);
-  console.log(arr);
-  var k=0;
-  for (var i = 0; i < board.length; i++) {
-    if(board[i] !== 0){
-      board[i] = arr[k++];
-      var cell = tableCell(i);
-      //cell.innerHTML = board[i];
-      cell.style.backgroundImage = "url('img/r_" + board[i] + ".png')";
-    }
-  }
-}
-
-
-//find out whether there is a pair
-var reshuffleIfNeeded = function(board){
-  if(remaining !== 0){
-    while(!linkExist(board)){
-      reshuffleBoard(board);
-      break;
-    }
-  }else{
-    //win
-    $("#win").text("You won");
-  }
-}
-
-var indexToPosition = function(index){
-  return {x: Math.floor(index/Y), y:index%Y};
-}
-
-var positionToIndex = function(pos){
-  return pos.x * Y + pos.y;
-}
-
-var possibleNeighbors = function(index, board, visited, targetIndex){
+var possibleNeighbors = function(index, board, visited, targetIndex) {
   var pos = indexToPosition(index);
   // directions in order: up, right, down, left
-  var deltas = [{x: -1, y: 0}, {x: 0, y: 1}, {x: 1, y: 0}, {x: 0, y: -1}];
+  var deltas = [{ x: -1, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 0 }, { x: 0, y: -1 }];
   var directions = ['up', 'right', 'down', 'left'];
   var neighbors = [];
 
   for (var i = 0; i < deltas.length; i++) {
-    var neighborPos = {x: pos.x + deltas[i].x, y: pos.y + deltas[i].y};
+    var neighborPos = { x: pos.x + deltas[i].x, y: pos.y + deltas[i].y };
     if (neighborPos.x >= 0 && neighborPos.x < X && neighborPos.y >= 0 && neighborPos.y < Y) {
       var neighbor = positionToIndex(neighborPos);
       if (board[neighbor] !== 0 && neighbor !== targetIndex) {
@@ -204,7 +63,7 @@ var possibleNeighbors = function(index, board, visited, targetIndex){
     }
   }
   return neighbors;
-}
+};
 
 var getPath = function(visited, index1, index2) {
   // path: left-right, up-down, up-left, up-right, down-left, down-right
@@ -214,7 +73,7 @@ var getPath = function(visited, index1, index2) {
   }
 
   // reverse deltas
-  var reverseDeltas = [{x: 1, y: 0}, {x: 0, y: -1}, {x: -1, y: 0}, {x: 0, y: 1}];
+  var reverseDeltas = [{ x: 1, y: 0 }, { x: 0, y: -1 }, { x: -1, y: 0 }, { x: 0, y: 1 }];
   var directions = ['up', 'right', 'down', 'left'];
 
   var current = index2;
@@ -265,67 +124,119 @@ var getPath = function(visited, index1, index2) {
   }
 
   return path;
-}
+};
 
-//find path
+// find path
 var findPath = function(board, index1, index2) {
   var visited = new Array(board.length);
-  for (var i = 0; i < visited.length; i++) {
-    visited[i] = {up: 100, down: 100, left: 100, right: 100};
+  var i;
+  for (i = 0; i < visited.length; i++) {
+    visited[i] = { up: 100, down: 100, left: 100, right: 100 };
   }
 
   var queue = [];
   queue.push(index1);
-  visited[index1] = {up: 0, down: 0, left: 0, right: 0};
+  visited[index1] = { up: 0, down: 0, left: 0, right: 0 };
   while (queue.length > 0) {
     var curIndex = queue.shift();
     if (curIndex === index2) {
       return getPath(visited, index1, index2);
     }
     var neighbors = possibleNeighbors(curIndex, board, visited, index2);
-    for (var i = 0; i < neighbors.length; i++) {
+    for (i = 0; i < neighbors.length; i++) {
       queue.push(neighbors[i]);
     }
   }
   return null;
-}
+};
+
+// check whether a pair of link exist
+var linkExist = function(board) {
+  for (var i = 0; i < board.length - 1; i++) {
+    if (board[i] !== 0) {
+      for (var j = i + 1; j < board.length; j++) {
+        if (board[j] === board[i] && findPath(board, i, j) !== null) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+};
+
+var shuffle = function(arr) {
+  var t;
+  var value;
+  for (var i = arr.length - 1; i >= 0; i--) {
+    t = Math.floor(Math.random() * (i + 1));
+    value = arr[t];
+    arr[t] = arr[i];
+    arr[i] = value;
+  }
+};
+
+//
+var reshuffleBoard = function(board) {
+  var arr = [];
+  var i;
+  for (i = 0; i < board.length; i++) {
+    if (board[i] !== 0) {
+      arr.push(board[i]);
+    }
+  }
+  shuffle(arr);
+  var k = 0;
+  for (i = 0; i < board.length; i++) {
+    if (board[i] !== 0) {
+      board[i] = arr[k++];
+      var cell = tableCell(i);
+      cell.style.backgroundImage = 'url("img/r_' + board[i] + '.png")';
+    }
+  }
+};
+
+// find out whether there is a pair
+var reshuffleIfNeeded = function(board) {
+  if (remaining !== 0) {
+    while (!linkExist(board)) {
+      reshuffleBoard(board);
+      break;
+    }
+  } else {
+    $('#win').text('You won');
+  }
+};
 
 var hideLines = function() {
   for (var i = 0; i < lastPath.length; i++) {
     if (lastPath[i] !== '') {
-      //tableCell(i).innerHTML = "";
-      tableCell(i).style.backgroundImage = "";
+      tableCell(i).style.backgroundImage = '';
     }
   }
 
   var cell1 = tableCell(lastPair[0]);
-  //cell1.innerHTML = "";
-  cell1.style.backgroundImage = "";
-  cell1.className = "";
+  cell1.style.backgroundImage = '';
+  cell1.className = '';
   var cell2 = tableCell(lastPair[1]);
-  //cell2.innerHTML = "";
-  cell2.style.backgroundImage = "";
-  cell2.className = "";
+  cell2.style.backgroundImage = '';
+  cell2.className = '';
   showingLines = false;
-}
+};
 
-//Click handler get position from this
+// Click handler get position from this
 var onCellClick = function() {
   if (showingLines) {
     return;
   }
 
-  console.log("click cell " + this.id);
   var pId = this.id.split('_');
-  //console.log(arrId[1]);
   var curPosition = parseInt(pId[1]);
 
-  //console.log("initial",clickP1);
   if (theBoard[curPosition] === 0) {
     return;
   } else if (lastPosition === -1) {
     lastPosition = curPosition;
-    tableCell(curPosition).className = "highlight";
+    tableCell(curPosition).className = 'highlight';
   } else if (lastPosition === curPosition) {
     return;
   } else if (theBoard[lastPosition] === theBoard[curPosition]) {
@@ -334,14 +245,13 @@ var onCellClick = function() {
       return;
     }
 
-    tableCell(curPosition).className = "highlight";
+    tableCell(curPosition).className = 'highlight';
     lastPath = path;
     lastPair = [lastPosition, curPosition];
-    console.log("find path", path);
 
     for (var i = 0; i < path.length; i++) {
       if (path[i] !== '') {
-        tableCell(i).style.backgroundImage = "url('img/" + path[i] + ".png')";
+        tableCell(i).style.backgroundImage = 'url("img/' + path[i] + '.png")';
       }
     }
 
@@ -352,42 +262,109 @@ var onCellClick = function() {
     theBoard[curPosition] = 0;
     lastPosition = -1;
     remaining -= 2;
-    //console.log(theBoard);
-    //check whether a pair of link exist
+
+    // check whether a pair of link exist
     reshuffleIfNeeded(theBoard);
-    //console.log(linkExist(theBoard));
   } else {
-    //console.log("content",content,"clickArr[0].content",clickArr[0].content);
-    tableCell(lastPosition).className = "";
+    tableCell(lastPosition).className = '';
     lastPosition = -1;
-    //console.log(" X find path/ dif content");
   }
-}
+};
 
-document.getElementById("form").addEventListener("submit", function(evt) {
-  evt.preventDefault();
-  row = parseInt(document.getElementById("rows").value);
-  column = parseInt(document.getElementById("columns").value);
-  if((row * column) % 2 !== 0){
-    console.log("odd");
-    document.getElementById("rows").value = "";
-    document.getElementById("columns").value = "";
-    $("#alert").show();
-  }else {
-    $("table").find("tr").remove();
-    init();
+// create initial board
+var initBoard = function(board) {
+  if (showingLines) {
+    return;
   }
 
-});
+  if (lastPosition !== -1) {
+    tableCell(lastPosition).className = '';
+  }
 
-document.getElementById("clear").addEventListener("click", function() {
-    console.log("set clear button clicked");
-    document.getElementById("rows").value = "";
-    document.getElementById("columns").value = "";
+  lastPosition = -1;
+
+  remaining = row * column;
+  $('#win').text('');
+
+  var i;
+  var cell;
+  for (i = 0; i < total; i++) {
+    theBoard[i] = 0;
+    cell = tableCell(i);
+    cell.id = 'i_' + i;
+    cell.innerHTML = '';
+  }
+
+  for (i = 0; i < board.length; i++) {
+    if (board[i] === 0 && !isFrame(i)) {
+      var t = Math.floor(Math.random() * types) + 1;
+      board[i] = t;
+      cell = tableCell(i);
+      cell.style.backgroundImage = 'url("img/r_' + t + '.png")';
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        var c = Math.floor(Math.random() * (total - i)) + i;
+        if (board[c] === 0 && !isFrame(c)) {
+          board[c] = t;
+          cell = tableCell(c);
+          cell.style.backgroundImage = 'url("img/r_' + t + '.png")';
+          break;
+        }
+      }
+    }
+  }
+  reshuffleIfNeeded(board);
+};
+
+var init = function() {
+  $('#alert').hide();
+  X = row + 2;
+  Y = column + 2;
+  total = X * Y;
+  remaining = row * column;
+  theBoard = new Array(total);
+
+  var i;
+  for (i = 0; i < X; i++) {
+    // The value of -1 results in a new row being inserted at the last position.
+    var tr = table.insertRow(-1);
+    for (var j = 0; j < Y; j++) {
+      tr.insertCell(-1);
+    }
+  }
+
+  initBoard(theBoard);
+
+  var cells = document.getElementsByTagName('td');
+  // console.log(cells);
+  for (i = 0; i < cells.length; i++) {
+    // console.log('add click cell ' + cells[i].id);
+    cells[i].addEventListener('click', onCellClick);
+  }
+
+  document.getElementById('reset').addEventListener('click', function() {
+    $('#alert').hide();
+    initBoard(theBoard);
   });
-
-
+};
 
 init();
 
-// Link if 2 selections are same num
+document.getElementById('form').addEventListener('submit', function(evt) {
+  evt.preventDefault();
+  row = parseInt(document.getElementById('rows').value);
+  column = parseInt(document.getElementById('columns').value);
+  if ((row * column) % 2 !== 0) {
+    document.getElementById('rows').value = '';
+    document.getElementById('columns').value = '';
+    $('#alert').show();
+  } else {
+    $('table').find('tr').remove();
+    init();
+  }
+});
+
+document.getElementById('clear').addEventListener('click', function() {
+  document.getElementById('rows').value = '';
+  document.getElementById('columns').value = '';
+});
