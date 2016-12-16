@@ -5,15 +5,30 @@ var X;
 var Y;
 var total;
 var remaining;
-
+var time;
+var interval = null;
 var table = document.getElementById('table');
-
+var TIME = 5;
 var theBoard;
 
 var lastPosition = -1;
 var lastPair = [];
 var lastPath = [];
 var showingLines = false;
+var gameEnd;
+// Start a timer that counts down
+
+var tick = function() {
+  time -= 1; // actual time
+  document.getElementById('status').textContent = time;  // display
+  // Check if I ran out of time
+  if (time <= 0) {
+    document.getElementById('status').textContent = 'You lost';
+    clearInterval(interval);
+    interval = null;
+    gameEnd = true;
+  }
+};
 
 var indexToPosition = function(index) {
   return { x: Math.floor(index / Y), y: index % Y };
@@ -203,7 +218,10 @@ var reshuffleIfNeeded = function(board) {
       break;
     }
   } else {
-    $('#win').text('You won');
+    $('#status').text('You won');
+    clearInterval(interval);
+    interval = null;
+    gameEnd = true;
   }
 };
 
@@ -228,7 +246,9 @@ var onCellClick = function() {
   if (showingLines) {
     return;
   }
-
+  if (gameEnd) {
+    return;
+  }
   var pId = this.id.split('_');
   var curPosition = parseInt(pId[1]);
 
@@ -262,7 +282,8 @@ var onCellClick = function() {
     theBoard[curPosition] = 0;
     lastPosition = -1;
     remaining -= 2;
-
+    time = TIME;
+    $('#status').text(time);
     // check whether a pair of link exist
     reshuffleIfNeeded(theBoard);
   } else {
@@ -282,9 +303,15 @@ var initBoard = function(board) {
   }
 
   lastPosition = -1;
-
+  gameEnd = false;
   remaining = row * column;
-  $('#win').text('');
+  time = TIME;
+  $('#status').text(time);
+
+  if (interval !== null) {
+    clearInterval(interval);
+  }
+  interval = setInterval(tick, 1000);
 
   var i;
   var cell;
@@ -362,9 +389,4 @@ document.getElementById('form').addEventListener('submit', function(evt) {
     $('table').find('tr').remove();
     init();
   }
-});
-
-document.getElementById('clear').addEventListener('click', function() {
-  document.getElementById('rows').value = '';
-  document.getElementById('columns').value = '';
 });
