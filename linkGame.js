@@ -1,5 +1,5 @@
-var row = 6;
-var column = 8;
+var row = 7;
+var column = 12;
 var types = 18;
 var X;
 var Y;
@@ -8,7 +8,7 @@ var remaining;
 var time;
 var interval = null;
 var table = document.getElementById('table');
-var TIME = 5;
+var TIME = 10;
 var theBoard;
 
 var lastPosition = -1;
@@ -18,12 +18,19 @@ var showingLines = false;
 var gameEnd;
 // Start a timer that counts down
 
+
 var tick = function() {
   time -= 1; // actual time
-  document.getElementById('status').textContent = time;  // display
+  var elem = document.getElementById("myBar");
+  var width = 100*time/TIME;
+
+  //document.getElementById('status').textContent = time;  // display
+  elem.style.width = width + '%';
+  console.log(elem.style.width);
   // Check if I ran out of time
   if (time <= 0) {
-    document.getElementById('status').textContent = 'You lost';
+    document.getElementById('modal-body-gameover').innerHTML = '<img src="img/loss.png">';
+    $('#gameOverModal').modal('show');
     clearInterval(interval);
     interval = null;
     gameEnd = true;
@@ -217,7 +224,8 @@ var reshuffleIfNeeded = function(board) {
       reshuffleBoard(board);
     }
   } else {
-    $('#status').text('You won');
+    document.getElementById('modal-body-gameover').innerHTML = '<img src="img/win.png">';
+    $('#gameOverModal').modal('show');
     clearInterval(interval);
     interval = null;
     gameEnd = true;
@@ -282,7 +290,7 @@ var onCellClick = function() {
     lastPosition = -1;
     remaining -= 2;
     time = TIME;
-    $('#status').text(time);
+    //$('#status').text(time);
     // check whether a pair of link exist
     reshuffleIfNeeded(theBoard);
   } else {
@@ -305,7 +313,7 @@ var initBoard = function(board) {
   gameEnd = false;
   remaining = row * column;
   time = TIME;
-  $('#status').text(time);
+  //$('#status').text(time);
 
   if (interval !== null) {
     clearInterval(interval);
@@ -374,18 +382,21 @@ var init = function() {
   });
 };
 
-init();
-
-document.getElementById('form').addEventListener('submit', function(evt) {
-  evt.preventDefault();
-  row = parseInt(document.getElementById('rows').value);
-  column = parseInt(document.getElementById('columns').value);
-  if ((row * column) % 2 !== 0) {
-    document.getElementById('rows').value = '';
-    document.getElementById('columns').value = '';
-    $('#alert').show();
-  } else {
-    $('table').find('tr').remove();
-    init();
-  }
+$('#gameStartModal').modal('show');
+document.getElementById('startButton').addEventListener('click', function() {
+  init();
 });
+
+// document.getElementById('form').addEventListener('submit', function(evt) {
+//   evt.preventDefault();
+//   //row = parseInt(document.getElementById('rows').value);
+//   //column = parseInt(document.getElementById('columns').value);
+//   if ((row * column) % 2 !== 0) {
+//     document.getElementById('rows').value = '';
+//     document.getElementById('columns').value = '';
+//     $('#alert').show();
+//   } else {
+//     $('table').find('tr').remove();
+//     init();
+//   }
+// });
