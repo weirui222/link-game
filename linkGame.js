@@ -1,5 +1,5 @@
-var row = 7;
-var column = 12;
+var row = 5;
+var column = 8;
 var types = 18;
 var X;
 var Y;
@@ -45,9 +45,20 @@ var positionToIndex = function(pos) {
   return pos.x * Y + pos.y;
 };
 
-var isFrame = function(index) {
+var isBlank = function(index) {
   var pos = indexToPosition(index);
-  return pos.x === 0 || pos.x === X - 1 || pos.y === 0 || pos.y === Y - 1;
+  if ((pos.x * 2 + 1) === X && (pos.y * 2 + 1) === Y) {
+    return true;
+  }
+
+  var x = (pos.x * 2 > X) ? (X - pos.x - 1) : pos.x;
+  var y = (pos.y * 2 > Y) ? (Y - pos.y - 1) : pos.y;
+
+  if (x % 2 === 0) {
+    return !(y < x && y % 2 === 1);
+  } else {
+    return y < x && y % 2 === 0;
+  }
 };
 
 var tableCell = function(index) {
@@ -310,8 +321,8 @@ var initBoard = function(board) {
   }
 
   lastPosition = -1;
+  remaining = 0;
   gameEnd = false;
-  remaining = row * column;
   time = TIME;
   //$('#status').text(time);
 
@@ -330,7 +341,7 @@ var initBoard = function(board) {
   }
 
   for (i = 0; i < board.length; i++) {
-    if (board[i] === 0 && !isFrame(i)) {
+    if (board[i] === 0 && !isBlank(i)) {
       var t = Math.floor(Math.random() * types) + 1;
       board[i] = t;
       cell = tableCell(i);
@@ -338,10 +349,11 @@ var initBoard = function(board) {
       // eslint-disable-next-line no-constant-condition
       while (true) {
         var c = Math.floor(Math.random() * (total - i)) + i;
-        if (board[c] === 0 && !isFrame(c)) {
+        if (board[c] === 0 && !isBlank(c)) {
           board[c] = t;
           cell = tableCell(c);
           cell.style.backgroundImage = 'url("img/r_' + t + '.png")';
+          remaining += 2;
           break;
         }
       }
@@ -352,10 +364,9 @@ var initBoard = function(board) {
 
 var init = function() {
   $('#alert').hide();
-  X = row + 2;
-  Y = column + 2;
+  X = 2 * row + 1;
+  Y = 2 * column + 1;
   total = X * Y;
-  remaining = row * column;
   theBoard = new Array(total);
 
   var i;
